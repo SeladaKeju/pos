@@ -129,10 +129,4 @@ class ProductsController extends Controller
             ], 500);
         }
     }
-
-    /**
-     * Hanya untuk Web (form), API tidak butuh — boleh dihapus
-     */
-    public function create() {}
-    public function edit() {}
 }
