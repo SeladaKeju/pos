@@ -3,9 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Orders;
-use App\Models\Customers;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class OrdersSeeder extends Seeder
@@ -15,15 +13,8 @@ class OrdersSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ensure we have customers and users before creating orders
-        $customerIds = Customers::pluck('id')->toArray();
+        // Ensure we have users before creating orders
         $userIds = User::pluck('id')->toArray();
-
-        if (empty($customerIds)) {
-            $this->command->info('Creating customers first...');
-            Customers::factory()->count(20)->create();
-            $customerIds = Customers::pluck('id')->toArray();
-        }
         
         if (empty($userIds)) {
             $this->command->info('Creating users first...');
@@ -31,11 +22,13 @@ class OrdersSeeder extends Seeder
             $userIds = User::pluck('id')->toArray();
         }
 
-        // Create 200 orders using existing customers and users
+        // Create 200 orders using existing users
         for ($i = 0; $i < 200; $i++) {
             Orders::factory()->create([
-                'customer_id' => $customerIds[array_rand($customerIds)],
-                'user_id' => $userIds[array_rand($userIds)]
+                'user_id' => $userIds[array_rand($userIds)],
+                'order_date' => fake()->dateTimeBetween('-30 days', 'now'),
+                'status' => fake()->randomElement(['pending', 'completed', 'cancelled']),
+                'is_paid' => fake()->boolean(80), // 80% chance of being paid
             ]);
         }
     }

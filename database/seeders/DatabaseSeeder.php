@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
 
         // Run custom seeders in order
         $this->call([
-            CustomersSeeder::class,
             ProductsSeeder::class,
             OrdersSeeder::class,
             OrderItemsSeeder::class,
