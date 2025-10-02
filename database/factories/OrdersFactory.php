@@ -2,10 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-
-use App\Models\Customers;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Orders>
@@ -20,10 +18,12 @@ class OrdersFactory extends Factory
     public function definition(): array
     {
         return [
-            'customer_id' => Customers::factory(),
             'order_number' => 'ORD-' . $this->faker->unique()->numerify('######'),
             'user_id' => User::factory(),
+            'order_date' => $this->faker->dateTimeBetween('-30 days', 'now'),
+            'status' => $this->faker->randomElement(['pending', 'completed', 'cancelled']),
             'total_amount' => $this->faker->randomFloat(2, 10000, 500000), // Between 10k and 500k
+            'is_paid' => $this->faker->boolean(80), // 80% chance of being paid
         ];
     }
 }
