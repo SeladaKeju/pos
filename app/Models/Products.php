@@ -18,8 +18,25 @@ class Products extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'price' => 'decimal:2',
+        'stock' => 'integer',
+        'is_active' => 'boolean',
+    ];
+
+    /**
+     * Get order items for this product
+     */
     public function orderItems()
     {
         return $this->hasMany(OrderItems::class, 'product_id');
+    }
+
+    /**
+     * Get cart items for this product
+     */
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class, 'product_id');
     }
 }
