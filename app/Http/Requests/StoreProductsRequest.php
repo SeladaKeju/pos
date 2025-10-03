@@ -25,7 +25,7 @@ class StoreProductsRequest extends FormRequest
             'name'       => ['required','string','max:255'],
             'price'      => ['required','numeric','min:0'],
             'stock'      => ['required','integer','min:0'],
-            'sku'        => ['required','string','max:100','unique:products,sku'],
+            'sku'        => ['sometimes','string','max:100','unique:products,sku'], // SKU sekarang optional
             'is_active'  => ['sometimes','boolean'],
         ];
     }

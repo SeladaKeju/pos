@@ -1,0 +1,203 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Interfaces\CartRepositoryInterface;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class CartController extends Controller
+{
+    private CartRepositoryInterface $cartRepository;
+
+    public function __construct(CartRepositoryInterface $cartRepository)
+    {
+        $this->cartRepository = $cartRepository;
+    }
+
+    /**
+     * Get user's active cart
+     * GET /api/cart
+     */
+    public function index(Request $request)
+    {
+        try {
+            $cart = $this->cartRepository->getOrCreateCart($request->user()->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart retrieved successfully',
+                'data' => $cart
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve cart',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Add item to cart
+     * POST /api/cart/items
+     */
+    public function addItem(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'product_id' => 'required|exists:products,id',
+                'quantity' => 'required|integer|min:1',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $cart = $this->cartRepository->getOrCreateCart($request->user()->id);
+            $cartItem = $this->cartRepository->addItem($cart->id, $request->all());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Item added to cart successfully',
+                'data' => $cartItem
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to add item to cart',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Update cart item quantity
+     * PUT /api/cart/items/{id}
+     */
+    public function updateItem(Request $request, $id)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'quantity' => 'required|integer|min:0',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $cartItem = $this->cartRepository->updateItem($id, $request->quantity);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart item updated successfully',
+                'data' => $cartItem
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update cart item',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Remove item from cart
+     * DELETE /api/cart/items/{id}
+     */
+    public function removeItem($id)
+    {
+        try {
+            $this->cartRepository->removeItem($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Item removed from cart successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to remove item from cart',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Clear cart
+     * DELETE /api/cart
+     */
+    public function clearCart(Request $request)
+    {
+        try {
+            $cart = $this->cartRepository->getUserCart($request->user()->id);
+
+            if (!$cart) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cart not found'
+                ], 404);
+            }
+
+            $this->cartRepository->clearCart($cart->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart cleared successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to clear cart',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Checkout cart (convert to order)
+     * POST /api/cart/checkout
+     */
+    public function checkout(Request $request)
+    {
+        try {
+            $cart = $this->cartRepository->getUserCart($request->user()->id);
+
+            if (!$cart) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cart not found'
+                ], 404);
+            }
+
+            $order = $this->cartRepository->checkout($cart->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Checkout completed successfully',
+                'data' => $order
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Checkout failed',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+}
