@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Interfaces\CartRepositoryInterface;
+use App\Http\Requests\AddToCartRequest;
+use App\Http\Requests\UpdateCartItemRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
@@ -23,7 +25,7 @@ class CartController extends Controller
     public function index(Request $request)
     {
         try {
-            $cart = $this->cartRepository->getOrCreateCart($request->user()->id);
+            $cart = $this->cartRepository->getOrCreateCart(Auth::user()->id);
 
             return response()->json([
                 'success' => true,
@@ -43,24 +45,11 @@ class CartController extends Controller
      * Add item to cart
      * POST /api/cart/items
      */
-    public function addItem(Request $request)
+    public function addItem(AddToCartRequest $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'product_id' => 'required|exists:products,id',
-                'quantity' => 'required|integer|min:1',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation error',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $cart = $this->cartRepository->getOrCreateCart($request->user()->id);
-            $cartItem = $this->cartRepository->addItem($cart->id, $request->all());
+            $cart = $this->cartRepository->getOrCreateCart(Auth::user()->id);
+            $cartItem = $this->cartRepository->addItem($cart->id, $request->validated());
 
             return response()->json([
                 'success' => true,
@@ -81,22 +70,11 @@ class CartController extends Controller
      * Update cart item quantity
      * PUT /api/cart/items/{id}
      */
-    public function updateItem(Request $request, $id)
+    public function updateItem(UpdateCartItemRequest $request, $id)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'quantity' => 'required|integer|min:0',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation error',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $cartItem = $this->cartRepository->updateItem($id, $request->quantity);
+            $validated = $request->validated();
+            $cartItem = $this->cartRepository->updateItem($id, $validated['quantity']);
 
             return response()->json([
                 'success' => true,
@@ -143,7 +121,7 @@ class CartController extends Controller
     public function clearCart(Request $request)
     {
         try {
-            $cart = $this->cartRepository->getUserCart($request->user()->id);
+            $cart = $this->cartRepository->getUserCart(Auth::user()->id);
 
             if (!$cart) {
                 return response()->json([
@@ -175,7 +153,7 @@ class CartController extends Controller
     public function checkout(Request $request)
     {
         try {
-            $cart = $this->cartRepository->getUserCart($request->user()->id);
+            $cart = $this->cartRepository->getUserCart(Auth::user()->id);
 
             if (!$cart) {
                 return response()->json([
