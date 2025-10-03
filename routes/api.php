@@ -26,6 +26,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Orders CRUD
     Route::apiResource('orders', OrdersController::class);
     
+    // Order Extra Routes
+    Route::get('/orders/{id}/items', [OrdersController::class, 'getOrderWithItems']);     // Get order with items
+    Route::post('/orders/{id}/finalize', [OrdersController::class, 'finalizeOrder']);     // Finalize order
+    
     // Cart Routes
     Route::prefix('cart')->group(function () {
         // Get user's active cart

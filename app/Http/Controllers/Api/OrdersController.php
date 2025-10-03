@@ -17,8 +17,10 @@ class OrdersController extends Controller
     {
         $this->orderRepository = $orderRepository;
     }
+
     /**
-     * Display a listing of the resource.
+     * Get all orders
+     * GET /api/orders
      */
     public function index()
     {
@@ -39,7 +41,8 @@ class OrdersController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Create new order with items
+     * POST /api/orders
      */
     public function store(StoreOrdersRequest $request)
     {
@@ -60,7 +63,8 @@ class OrdersController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Get single order detail
+     * GET /api/orders/{id}
      */
     public function show(Orders $orders)
     {
@@ -89,7 +93,8 @@ class OrdersController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update order information
+     * PUT /api/orders/{id}
      */
     public function update(UpdateOrdersRequest $request, Orders $orders)
     {
@@ -117,9 +122,9 @@ class OrdersController extends Controller
         }
     }
 
-
     /**
-     * Remove the specified resource from storage.
+     * Delete order and restore stock
+     * DELETE /api/orders/{id}
      */
     public function destroy(Orders $orders)
     {
@@ -146,6 +151,10 @@ class OrdersController extends Controller
         }
     }
 
+    /**
+     * Get order with detailed items
+     * GET /api/orders/{id}/items
+     */
     public function getOrderWithItems(int $orderId): JsonResponse
     {
         try {
@@ -172,6 +181,10 @@ class OrdersController extends Controller
         }
     }
 
+    /**
+     * Finalize order (mark as completed and paid)
+     * POST /api/orders/{id}/finalize
+     */
     public function finalizeOrder(int $orderId): JsonResponse
     {
         try {
