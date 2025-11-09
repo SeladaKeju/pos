@@ -36,6 +36,14 @@ class Cart extends Model
     }
 
     /**
+     * Get the order created from this cart (if any)
+     */
+    public function order()
+    {
+        return $this->hasOne(Orders::class, 'cart_id');
+    }
+
+    /**
      * Calculate and update total amount
      */
     public function updateTotalAmount()

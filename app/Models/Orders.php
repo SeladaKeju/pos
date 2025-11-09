@@ -17,6 +17,7 @@ class Orders extends Model
         'total_amount',
         'is_paid',
         'user_id',
+        'cart_id', // Tambahan untuk track cart asal
     ];
 
     protected $casts = [
@@ -34,11 +35,27 @@ class Orders extends Model
     }
 
     /**
+     * Get the cart that created this order
+     */
+    public function cart()
+    {
+        return $this->belongsTo(Cart::class, 'cart_id');
+    }
+
+    /**
      * Get the order items
      */
     public function orderItems()
     {
         return $this->hasMany(OrderItems::class, 'order_id');
+    }
+
+    /**
+     * Get the payment for this order
+     */
+    public function payment()
+    {
+        return $this->hasOne(Payment::class, 'order_id');
     }
 
     /**

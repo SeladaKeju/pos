@@ -170,14 +170,15 @@ class CartRepository implements CartRepositoryInterface
                 }
             }
 
-            // Create order
+            // Create order from cart
             $order = Orders::create([
                 'user_id' => $cart->user_id,
+                'cart_id' => $cart->id, // Track cart yang membuat order ini
                 'order_number' => 'ORD-' . time() . '-' . $cart->id,
                 'order_date' => now(),
-                'status' => 'completed',
+                'status' => 'pending', // Status pending sampai dibayar
                 'total_amount' => $cart->total_amount,
-                'is_paid' => true,
+                'is_paid' => false, // Belum dibayar
             ]);
 
             // Create order items and update stock

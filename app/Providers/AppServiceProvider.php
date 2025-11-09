@@ -30,6 +30,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Interfaces\CartRepositoryInterface::class,
             \App\Repositories\CartRepository::class
         );
+
+        $this->app->bind(
+            \App\Interfaces\PaymentRepositoryInterface::class,
+            \App\Repositories\PaymentRepository::class
+        );
     }
 
     /**

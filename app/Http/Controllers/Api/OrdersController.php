@@ -66,10 +66,10 @@ class OrdersController extends Controller
      * Get single order detail
      * GET /api/orders/{id}
      */
-    public function show(Orders $orders)
+    public function show($id)
     {
         try {
-            $order = $this->orderRepository->getOrderById($orders->id);
+            $order = $this->orderRepository->getOrderById($id);
 
             if (!$order) {
                 return response()->json([
@@ -96,10 +96,10 @@ class OrdersController extends Controller
      * Update order information
      * PUT /api/orders/{id}
      */
-    public function update(UpdateOrdersRequest $request, Orders $orders)
+    public function update(UpdateOrdersRequest $request, $id)
     {
         try {
-            $order = $this->orderRepository->updateOrder($orders->id, $request->validated());
+            $order = $this->orderRepository->updateOrder($id, $request->validated());
 
             if (!$order) {
                 return response()->json([
@@ -126,10 +126,10 @@ class OrdersController extends Controller
      * Delete order and restore stock
      * DELETE /api/orders/{id}
      */
-    public function destroy(Orders $orders)
+    public function destroy($id)
     {
         try {
-            $deleted = $this->orderRepository->deleteOrder($orders->id);
+            $deleted = $this->orderRepository->deleteOrder($id);
 
             if (!$deleted) {
                 return response()->json([

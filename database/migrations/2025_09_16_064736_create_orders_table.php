@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('order_number', 100)->unique();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('cart_id')->nullable()->constrained('carts')->onDelete('set null');
             $table->timestamp('order_date')->useCurrent();
             $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
             $table->decimal('total_amount', 12, 2);

@@ -34,5 +34,9 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'xendit' => [
+        'secret_key'     => env('xnd_development_4i8RpzsT9GMq1O7pLXFKTOeYSwGXXemOH95NzKRMlHW0retLm4XgZH151AnWd2N'),
+        'callback_token' => env('xnd_public_development_QYn2sPbN8t6lJgmfDPXrkjFruyX1k4hufcnDcRdY3FxaCgguKUeF_CjIMbrfjjad'),
+        'api_base'       => 'https://api.xendit.co',
+    ],
 ];
